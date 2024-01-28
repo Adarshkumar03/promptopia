@@ -4,22 +4,26 @@ import { useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 
-const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
-  const [copied, setCopied] = useState("");
-  const handleCopy = () => {
-    setCopied(post.prompt);
-    navigator.clipboard.writeText(post.prompt);
-    setTimeout(() => setCopied(""), 3000);
-  };
+const PromptCard = ({ post, handleEdit, handleDelete, handleTagClick }) => {
   const { data: session } = useSession();
   const pathName = usePathname();
   const router = useRouter();
 
+  const [copied, setCopied] = useState("");
+
   const handleProfileClick = () => {
+    console.log(post);
+
     if (post.creator._id === session?.user.id) return router.push("/profile");
-    router.push(`/profile${post.creator._id}?name=${post.creator.username}`);
+
+    router.push(`/profile/${post.creator._id}?name=${post.creator.username}`);
+  };
+
+  const handleCopy = () => {
+    setCopied(post.prompt);
+    navigator.clipboard.writeText(post.prompt);
+    setTimeout(() => setCopied(false), 3000);
   };
 
   return (
@@ -38,7 +42,7 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
           />
 
           <div className="flex flex-col">
-            <h3 className="font-satoshi font-semibold text-gray-500">
+            <h3 className="font-satoshi font-semibold text-gray-900">
               {post.creator.username}
             </h3>
             <p className="font-inter text-sm text-gray-500">
@@ -46,6 +50,7 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
             </p>
           </div>
         </div>
+
         <div className="copy_btn" onClick={handleCopy}>
           <Image
             src={
@@ -53,18 +58,21 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
                 ? "/assets/icons/tick.svg"
                 : "/assets/icons/copy.svg"
             }
+            alt={copied === post.prompt ? "tick_icon" : "copy_icon"}
             width={12}
             height={12}
           />
         </div>
       </div>
-      <p className="ny-4 font-satoshi text-sm text-gray-700">{post.prompt}</p>
+
+      <p className="my-4 font-satoshi text-sm text-gray-700">{post.prompt}</p>
       <p
         className="font-inter text-sm blue_gradient cursor-pointer"
         onClick={() => handleTagClick && handleTagClick(post.tag)}
       >
         #{post.tag}
       </p>
+
       {session?.user.id === post.creator._id && pathName === "/profile" && (
         <div className="mt-5 flex-center gap-4 border-t border-gray-100 pt-3">
           <p
