@@ -21,6 +21,16 @@ const Feed = () => {
   const [allPosts, setAllPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
 
+  const fetchPosts = async () => {
+    const response = await fetch("/api/prompt");
+    const data = await response.json();
+    setAllPosts(data);
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
   const filterPosts = (searchText) => {
     const reg = new RegExp(searchText, "i");
     return allPosts.filter(
@@ -39,14 +49,6 @@ const Feed = () => {
     setFilteredPosts(filterPosts(tagName));
   };
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch("/api/prompt");
-      const data = await response.json();
-      setAllPosts(data);
-    };
-    fetchPosts();
-  }, []);
   return (
     <section className="feed">
       <form className="relative w-full flex-center">
@@ -60,10 +62,11 @@ const Feed = () => {
         />
       </form>
 
-      <PromptCardList
-        data={searchText ? filteredPosts : allPosts}
-        handleTagClick={handleTagClick}
-      />
+      {searchText ? (
+        <PromptCardList data={filteredPosts} handleTagClick={handleTagClick} />
+      ) : (
+        <PromptCardList data={allPosts} handleTagClick={handleTagClick} />
+      )}
     </section>
   );
 };
