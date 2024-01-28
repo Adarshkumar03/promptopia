@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const Profile = ({ params }) => {
   let [posts, setPosts] = useState({});
@@ -19,10 +20,12 @@ const Profile = ({ params }) => {
     if (params?.id) fetchPosts();
   }, [params.id]);
   return (
-    <Profile
-      name={username}
-      desc={`Welcome to ${username}'s personalized profile page. Share your exceptional prompts and inspire others with the power of your imagination`}
-      data={posts}
-    />
+    <Suspense>
+      <Profile
+        name={username}
+        desc={`Welcome to ${username}'s personalized profile page. Share your exceptional prompts and inspire others with the power of your imagination`}
+        data={posts}
+      />
+    </Suspense>
   );
 };
